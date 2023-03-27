@@ -1,6 +1,7 @@
-const mongoose = require('mongoose');
 const User = require('../schemas/User');
+const Session = require('../schemas/Session');
 const md5 = require('md5')
+const { v4: uuidV4 } = require('uuid')
 
 const checkIfUserExist = async (login) => {
   const result = await User.findOne({ login });
@@ -53,11 +54,36 @@ const loginUser = async (req, res, next) => {
     return;
   }
 
-  console.log('user', user);
+  const { login: userLogin, _id: id } = user;
+
+  const { 'session-id': sessionId } = req.cookies;
+
+  console.log('\nsessionId', sessionId);
+  console.log('\nreq.cookies', req.cookies);
+
+  if (sessionId) {
+    const session = await Session.findOne({ id: sessionId });
+
+    if (!session) {
+      const newSession = new Session({
+        id: sessionId,
+        data: {
+          id,
+          isLoggedIn: true,
+          authToken: uuidV4(),
+        },
+        ttl: 60 * 60 * 24 * 365,
+        created: +Date.now()
+      });
+
+      console.log('newSession ', newSession);
+    }
+  }
 
   res.send({
     user: {
-      id: user._id,
+      login: userLogin,
+      id
     },
   });
 }

@@ -43,7 +43,7 @@ const kittySchema = new mongoose.Schema({
 });
 
 const Kitten = mongoose.model('Kitten', kittySchema);
-
+/*
 const sessionSchema = new mongoose.Schema({
   id: String,
   data: Object,
@@ -85,6 +85,7 @@ app.get('/getSessionInfo', (req, res, next) => {
     });
   });
 });
+*/
 
 app.get('/endpoint1', (req, res, next) => {
   res.set({
